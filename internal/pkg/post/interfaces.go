@@ -12,6 +12,7 @@ type PostRepository interface {
 	GetPosts(ctx context.Context) ([]*models.Post, error)
 	GetPost(ctx context.Context, id uint) (*models.Post, error)
 	DisableComments(ctx context.Context, postID uint) (bool, error)
+	PostExists(ctx context.Context, postID uint) (bool, error)
 }
 
 type PostUsecases interface {
@@ -19,4 +20,7 @@ type PostUsecases interface {
 	GetPost(ctx context.Context, args args.PostArgs) (any, error)
 	CreatePost(ctx context.Context, args args.CreatePostArgs) (any, error)
 	DisableComments(ctx context.Context, args args.DisableCommentsArgs) (any, error)
+
+	PostExists(ctx context.Context, postID uint) error
+	CommentsDisabled(ctx context.Context, postID uint) error
 }

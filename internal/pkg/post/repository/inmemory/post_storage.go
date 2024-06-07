@@ -68,3 +68,12 @@ func (r *inMemoryPostRepository) DisableComments(ctx context.Context, postID uin
 
 	return post.AreCommentsDisabled, nil
 }
+
+func (r *inMemoryPostRepository) PostExists(ctx context.Context, postID uint) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	_, exists := r.posts[postID]
+
+	return exists, nil
+}

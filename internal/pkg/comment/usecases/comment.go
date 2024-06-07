@@ -8,11 +8,13 @@ import (
 	"github.com/MaratKamalovPD/o3_test_task/internal/models"
 	"github.com/MaratKamalovPD/o3_test_task/internal/models/args"
 	commentrepo "github.com/MaratKamalovPD/o3_test_task/internal/pkg/comment"
+	postinterface "github.com/MaratKamalovPD/o3_test_task/internal/pkg/post"
 	utils "github.com/MaratKamalovPD/o3_test_task/internal/pkg/utils"
 )
 
 type CommentUsecases struct {
-	storage commentrepo.CommentRepository
+	storage      commentrepo.CommentRepository
+	usecasesPost postinterface.PostUsecases
 }
 
 func NewCommentUsecases(storage commentrepo.CommentRepository) *CommentUsecases {
@@ -28,9 +30,12 @@ func (uc *CommentUsecases) GetCommentsByPost(ctx context.Context, args args.GetC
 		return nil, err
 	}
 
-	// if err := uc.postExists(ctx, args.PostID); err != nil {
-	// 	return nil, err
-	// }
+	err := uc.usecasesPost.PostExists(ctx, uint(args.PostID))
+
+	if err != nil {
+
+		return nil, err
+	}
 
 	comments, err := uc.storage.GetCommentsByPost(ctx, uint(args.PostID), uint(args.Limit), uint(args.Offset))
 	if err != nil {
@@ -58,16 +63,24 @@ func (uc *CommentUsecases) CreateComment(ctx context.Context, args args.CreateCo
 		CreatedAt:       time.Now().UTC(),
 	}
 
-	// if err := uc.postExists(ctx, args.PostID); err != nil {
-	// 	return nil, err
-	// }
-	// if err := uc.commentsDisabled(ctx, args.PostID); err != nil {
-	// 	return nil, err
-	// }
+	err := uc.usecasesPost.PostExists(ctx, uint(args.PostID))
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	err = uc.usecasesPost.CommentsDisabled(ctx, uint(args.PostID))
+
+	if err != nil {
+
+		return nil, err
+	}
 
 	savedComment, err := uc.storage.CreateComment(ctx, comment)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create comment: %w", err)
+
+		return nil, fmt.Errorf("something went wrong while creating comment, err=%w", err)
 	}
 
 	return savedComment, nil

@@ -192,3 +192,38 @@ func (r *postgresPostRepository) DisableComments(ctx context.Context, postID uin
 
 	return areCommentsDisabled, nil
 }
+
+func (r *postgresPostRepository) postExists(ctx context.Context, tx pgx.Tx, postID uint) (bool, error) {
+
+	SQLPostExists := `SELECT EXISTS(SELECT 1 FROM public.post WHERE id=$1 );`
+
+	userLine := tx.QueryRow(ctx, SQLPostExists, postID)
+
+	var exists bool
+
+	if err := userLine.Scan(&exists); err != nil {
+
+		return false, err
+	}
+
+	return exists, nil
+}
+
+func (r *postgresPostRepository) PostExists(ctx context.Context, postID uint) (bool, error) {
+	var exists bool
+
+	err := pgx.BeginFunc(ctx, r.pool, func(tx pgx.Tx) error {
+		userExists, err := r.postExists(ctx, tx, postID)
+		exists = userExists
+
+		return err
+	})
+
+	if err != nil {
+
+		return false, err
+	}
+
+	return exists, nil
+
+}
