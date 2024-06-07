@@ -11,7 +11,7 @@ type PostRepository interface {
 	CreatePost(ctx context.Context, post *models.Post) (*models.Post, error)
 	GetPosts(ctx context.Context) ([]*models.Post, error)
 	GetPost(ctx context.Context, id uint) (*models.Post, error)
-	DisableComments(ctx context.Context, postID uint) error
+	DisableComments(ctx context.Context, postID uint) (bool, error)
 }
 
 type PostUsecases interface {

@@ -55,12 +55,16 @@ func (r *inMemoryPostRepository) GetPost(ctx context.Context, id uint) (*models.
 	return post, nil
 }
 
-func (r *inMemoryPostRepository) DisableComments(ctx context.Context, postID uint) error {
+func (r *inMemoryPostRepository) DisableComments(ctx context.Context, postID uint) (bool, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	post := r.posts[postID]
-	post.AreCommentsDisabled = true
+	if post.AreCommentsDisabled {
+		post.AreCommentsDisabled = false
+	} else {
+		post.AreCommentsDisabled = true
+	}
 
-	return nil
+	return post.AreCommentsDisabled, nil
 }

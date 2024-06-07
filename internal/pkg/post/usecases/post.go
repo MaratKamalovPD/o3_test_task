@@ -94,11 +94,11 @@ func (uc *PostUsecases) DisableComments(ctx context.Context, args args.DisableCo
 	// 	return nil, err
 	// }
 
-	err := uc.storage.DisableComments(ctx, uint(args.PostID))
+	areCommentsDisabled, err := uc.storage.DisableComments(ctx, uint(args.PostID))
 	if err != nil {
 
 		return nil, fmt.Errorf("failed to disable comments: %w", err)
 	}
 
-	return true, nil
+	return areCommentsDisabled, nil
 }

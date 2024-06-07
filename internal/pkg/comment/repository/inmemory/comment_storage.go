@@ -39,7 +39,7 @@ func (r *inMemoryCommentRepository) filterByPostID(postID uint, comment *models.
 	return comment.PostID == postID
 }
 
-func (r *inMemoryCommentRepository) GetCommentsByPost(ctx context.Context, postID uint, limit, offset uint) ([]*models.Comment, error) {
+func (r *inMemoryCommentRepository) GetCommentsByPost(ctx context.Context, postID, limit, offset uint) ([]*models.Comment, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

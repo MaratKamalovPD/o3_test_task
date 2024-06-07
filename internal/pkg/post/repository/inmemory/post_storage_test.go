@@ -56,8 +56,9 @@ func TestDisableComments(t *testing.T) {
 
 	_, _ = repo.CreatePost(context.Background(), samplePost)
 
-	err := repo.DisableComments(context.Background(), 1)
+	areCommentsDisabled, err := repo.DisableComments(context.Background(), 1)
 	assert.NoError(t, err)
-
-	assert.True(t, samplePost.AreCommentsDisabled)
+	assert.True(t, areCommentsDisabled)
+	areCommentsDisabled, _ = repo.DisableComments(context.Background(), 1)
+	assert.False(t, areCommentsDisabled)
 }
