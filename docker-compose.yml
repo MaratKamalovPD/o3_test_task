@@ -31,6 +31,15 @@ services:
     depends_on:
       - postgres
 
+  main: 
+    build: ./
+    restart: always  
+    ports:
+      - "8080:8080"
+    volumes:
+      - main:/var/lib/main    
+
 volumes:
   postgres:
   pgadmin:
+  main:

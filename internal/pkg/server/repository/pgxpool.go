@@ -19,7 +19,8 @@ const (
 )
 
 func PGXPoolConfig() *pgxpool.Config {
-	const databaseURL = "postgres://postgres:postgres@localhost:5432/o3_test_task"
+	//const databaseURL = "postgres://postgres:postgres@localhost:5432/o3_test_task"
+	const databaseURL = "postgres://postgres:postgres@postgres:5432/o3_test_task"
 
 	dbConfig, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
