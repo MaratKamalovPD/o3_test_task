@@ -13,9 +13,11 @@ const (
 )
 
 type ServerConfig struct {
-	Host        string `yaml:"host"`
-	Port        string `yaml:"port"`
-	StorageType string `yaml:"storage_type"`
+	Host               string `yaml:"host"`
+	Port               string `yaml:"port"`
+	StorageType        string `yaml:"storage_type"`
+	DBConnectingURL    string `yaml:"db_connection_url"`
+	DBMigrationsFolder string `yaml:"db_migrations_folder"`
 }
 
 type Config struct {

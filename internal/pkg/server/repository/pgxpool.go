@@ -18,9 +18,9 @@ const (
 	defaultConnectTimeout    = time.Second * 5
 )
 
-func PGXPoolConfig() *pgxpool.Config {
+func PGXPoolConfig(databaseURL string) *pgxpool.Config {
 	//const databaseURL = "postgres://postgres:postgres@localhost:5432/o3_test_task"
-	const databaseURL = "postgres://postgres:postgres@postgres:5432/o3_test_task"
+	//const databaseURL = "postgres://postgres:postgres@postgres:5432/o3_test_task"
 
 	dbConfig, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {

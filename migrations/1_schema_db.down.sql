@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS public.post CASCADE;
+DROP TABLE IF EXISTS public.comment CASCADE;

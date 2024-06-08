@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	commentinterface "github.com/MaratKamalovPD/o3_test_task/internal/pkg/comment"
 	commentdelivery "github.com/MaratKamalovPD/o3_test_task/internal/pkg/comment/delivery/schema"
@@ -18,15 +17,13 @@ import (
 	postinmemorystorage "github.com/MaratKamalovPD/o3_test_task/internal/pkg/post/repository/inmemory"
 	postpostgresstorage "github.com/MaratKamalovPD/o3_test_task/internal/pkg/post/repository/postgres"
 	postusecases "github.com/MaratKamalovPD/o3_test_task/internal/pkg/post/usecases"
-	pgxpoolconfig "github.com/MaratKamalovPD/o3_test_task/internal/pkg/server/repository"
+	serverrepo "github.com/MaratKamalovPD/o3_test_task/internal/pkg/server/repository"
 	"github.com/graphql-go/handler"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
-	Timeout    = time.Second * 15
-	Address    = ":8080"
-	tickerTime = 10 * time.Minute
+	Address = ":8080"
 )
 
 type Server struct {
@@ -37,32 +34,43 @@ func (srv *Server) Run() error {
 
 	cfg := config.ReadConfig()
 
-	connPool, err := pgxpool.NewWithConfig(context.Background(), pgxpoolconfig.PGXPoolConfig())
-	if err != nil {
-		log.Fatal("Error while creating connection to the database")
-	}
+	var (
+		postRepo    postinterface.PostRepository
+		commentRepo commentinterface.CommentRepository
+	)
 
-	postRepo, err := createPostRepository(cfg, connPool)
-	if err != nil {
-		log.Fatal("Something went wrong while creating Post repository: ", err)
-	}
+	switch cfg.Server.StorageType {
+	case "inmemory":
+		postRepo = postinmemorystorage.NewInMemoryPostRepository()
+		commentRepo = commentinmemorystorage.NewInMemoryCommentRepository()
+	case "postgres":
+		connPool, err := pgxpool.NewWithConfig(context.Background(), serverrepo.PGXPoolConfig(cfg.Server.DBConnectingURL))
+		if err != nil {
+			log.Fatal("something went wrong while creating connection pool, err=", err)
+		}
 
-	commentRepo, err := createCommentRepository(cfg, connPool)
-	if err != nil {
-		log.Fatal("Something went wrong while creating Comment repository: ", err)
+		err = serverrepo.MakeMigrations(cfg.Server.DBMigrationsFolder, cfg.Server.DBConnectingURL)
+		if err != nil {
+			log.Fatal("something went wrong while making migrations, err=", err)
+		}
+
+		postRepo = postpostgresstorage.NewPostgresPostRepository(connPool)
+		commentRepo = commentpostgresstorage.NewPostgresCommentRepository(connPool)
+	default:
+		return fmt.Errorf("unknown repository type: %s", cfg.Server.StorageType)
 	}
 
 	postUsecases := postusecases.NewPostUsecases(postRepo)
-	commentUsecases := commentusecases.NewCommentUsecases(commentRepo)
+	commentUsecases := commentusecases.NewCommentUsecases(commentRepo, postUsecases)
 
 	postSchema, err := postdelivery.NewPostSchema(postUsecases)
 	if err != nil {
-		log.Fatal("Something went wrong while creating Post schema: ", err)
+		log.Fatal("something went wrong while creating Post schema: ", err)
 	}
 
 	commentSchema, err := commentdelivery.NewCommentSchema(commentUsecases)
 	if err != nil {
-		log.Fatal("Something went wrong while creating Comment schema: ", err)
+		log.Fatal("something went wrong while creating Comment schema: ", err)
 	}
 
 	postHandler := handler.New(&handler.Config{
@@ -83,37 +91,16 @@ func (srv *Server) Run() error {
 	mux.Handle("/comment", commentHandler)
 
 	srv.server = &http.Server{
-		Handler:      mux,
-		Addr:         Address,
-		ReadTimeout:  Timeout,
-		WriteTimeout: Timeout,
+		Handler: mux,
+		Addr:    Address,
 	}
+
+	log.Println("server is running on port ", Address)
 
 	return srv.server.ListenAndServe()
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
+
 	return s.server.Shutdown(ctx)
-}
-
-func createPostRepository(cfg *config.Config, pool *pgxpool.Pool) (postinterface.PostRepository, error) {
-	switch cfg.Server.StorageType {
-	case "inmemory":
-		return postinmemorystorage.NewInMemoryPostRepository(), nil
-	case "postgres":
-		return postpostgresstorage.NewPostgresPostRepository(pool), nil
-	default:
-		return nil, fmt.Errorf("unknown repository type: %s", cfg.Server.StorageType)
-	}
-}
-
-func createCommentRepository(cfg *config.Config, pool *pgxpool.Pool) (commentinterface.CommentRepository, error) {
-	switch cfg.Server.StorageType {
-	case "inmemory":
-		return commentinmemorystorage.NewInMemoryCommentRepository(), nil
-	case "postgres":
-		return commentpostgresstorage.NewPostgresCommentRepository(pool), nil
-	default:
-		return nil, fmt.Errorf("unknown repository type: %s", cfg.Server.StorageType)
-	}
 }

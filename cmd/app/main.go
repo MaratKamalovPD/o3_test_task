@@ -17,18 +17,18 @@ func main() {
 	var shutdownCannel chan os.Signal = signal.GetShutdownChannel()
 
 	go func() {
-		log.Println("Starting server on port")
+		log.Println("starting server")
+
 		if err := srv.Run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalln("Failed to start server: ", err)
+			log.Fatalln("something went wrong while starting the server, err=", err)
 		}
 	}()
 
 	<-shutdownCannel
-	log.Println("Gracefully shutting down server")
 
 	if err := srv.Shutdown(context.Background()); err != nil {
-		log.Fatalln("Failed to shutdown the server gracefully: ", err)
+		log.Fatalln("something went wrong while shutting down the server, err=", err)
 	}
 
-	log.Println("Server shutdown is successful")
+	log.Println("server was successful shut down")
 }

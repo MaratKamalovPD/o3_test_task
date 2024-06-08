@@ -3,7 +3,6 @@ package usecases
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/MaratKamalovPD/o3_test_task/internal/models"
 	"github.com/MaratKamalovPD/o3_test_task/internal/models/args"
@@ -64,10 +63,9 @@ func (uc *PostUsecases) CreatePost(ctx context.Context, args args.CreatePostArgs
 	}
 
 	post := &models.Post{
-		Title:     args.Title,
-		Content:   args.Content,
-		UserID:    uint(args.UserID),
-		CreatedAt: time.Now().UTC(),
+		Title:   args.Title,
+		Content: args.Content,
+		UserID:  uint(args.UserID),
 	}
 
 	savedPost, err := uc.storage.CreatePost(ctx, post)

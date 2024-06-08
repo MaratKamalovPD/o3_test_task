@@ -7,6 +7,8 @@ import (
 	"github.com/MaratKamalovPD/o3_test_task/internal/models/args"
 )
 
+//go:generate mockgen -source=interfaces.go -destination=mocks/mock.go
+
 type PostRepository interface {
 	CreatePost(ctx context.Context, post *models.Post) (*models.Post, error)
 	GetPosts(ctx context.Context) ([]*models.Post, error)

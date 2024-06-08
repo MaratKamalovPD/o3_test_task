@@ -3,7 +3,6 @@ package usecases
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/MaratKamalovPD/o3_test_task/internal/models"
 	"github.com/MaratKamalovPD/o3_test_task/internal/models/args"
@@ -17,8 +16,11 @@ type CommentUsecases struct {
 	usecasesPost postinterface.PostUsecases
 }
 
-func NewCommentUsecases(storage commentrepo.CommentRepository) *CommentUsecases {
-	return &CommentUsecases{storage: storage}
+func NewCommentUsecases(storage commentrepo.CommentRepository, usecasesPost postinterface.PostUsecases) *CommentUsecases {
+	return &CommentUsecases{
+		storage:      storage,
+		usecasesPost: usecasesPost,
+	}
 }
 
 func (uc *CommentUsecases) GetCommentsByPost(ctx context.Context, args args.GetCommentsArgs) (any, error) {
@@ -60,7 +62,6 @@ func (uc *CommentUsecases) CreateComment(ctx context.Context, args args.CreateCo
 		ParentCommentID: args.ParentCommentID,
 		UserID:          uint(args.UserID),
 		Content:         args.Content,
-		CreatedAt:       time.Now().UTC(),
 	}
 
 	err := uc.usecasesPost.PostExists(ctx, uint(args.PostID))

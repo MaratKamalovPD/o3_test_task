@@ -2,4 +2,6 @@ server:
     host: 127.0.0.1
     port: :8080
     storage_type: postgres
+    db_connection_url: postgres://postgres:postgres@localhost:5432/o3_test_task
+    db_migrations_folder: ./migrations
     
