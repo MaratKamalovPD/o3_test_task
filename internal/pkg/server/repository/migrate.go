@@ -13,30 +13,7 @@ import (
 
 func MakeMigrations(migrationURL string, dbSource string) error {
 
-	// migration, err := migrate.New("file://migrations", "postgres://postgres:postgres@localhost:5432/o3_test_task?sslmode=disable")
-	// if err != nil {
-
-	// 	return fmt.Errorf("something went wrong while creating new migration, err=%v", err)
-	// }
-
-	// driver, err := pgx.WithInstance(pool, &pgx.Config{})
-	// if err != nil {
-	// 	log.Fatalf("Failed to initialize pgx driver: %v", err)
-	// }
-
-	// m, err := migrate.NewWithDatabaseInstance("./migrations", "postgres", driver)
-	// if err != nil {
-	// 	log.Fatalf("Failed to create new migrate instance: %v", err)
-	// }
-
-	// if err = migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-
-	// 	return fmt.Errorf("something went wrong while up migrations, err=%v", err)
-	// }
-
-	// defer migration.Close()
-
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5432/o3_test_task?sslmode=disable")
+	db, err := sql.Open("postgres", dbSource)
 	if err != nil {
 
 		return fmt.Errorf("something went wrong while Open(), err=%v", err)
@@ -48,7 +25,7 @@ func MakeMigrations(migrationURL string, dbSource string) error {
 		return fmt.Errorf("something went wrong while WithInstance(), err=%v", err)
 	}
 
-	migration, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
+	migration, err := migrate.NewWithDatabaseInstance(migrationURL, "postgres", driver)
 	if err != nil {
 
 		return fmt.Errorf("something went wrong while NewWithDatabaseInstance(), err=%v", err)
@@ -60,6 +37,8 @@ func MakeMigrations(migrationURL string, dbSource string) error {
 
 		return fmt.Errorf("something went wrong while up migrations, err=%v", err)
 	}
+
+	defer migration.Close()
 
 	return nil
 }

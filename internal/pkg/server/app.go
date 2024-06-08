@@ -96,6 +96,7 @@ func (srv *Server) Run() error {
 	}
 
 	log.Println("server is running on port ", Address)
+	log.Println("storage type: ", cfg.Server.StorageType)
 
 	return srv.server.ListenAndServe()
 }
