@@ -21,6 +21,9 @@ func NewCommentObject() *graphql.Object {
 			"content": &graphql.Field{
 				Type: graphql.String,
 			},
+			"createdAt": &graphql.Field{
+				Type: graphql.DateTime,
+			},
 		},
 	})
 }

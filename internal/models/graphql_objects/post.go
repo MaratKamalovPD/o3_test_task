@@ -18,8 +18,11 @@ func NewPostObject() *graphql.Object {
 			"userId": &graphql.Field{
 				Type: graphql.Int,
 			},
-			"commentsDisabled": &graphql.Field{
+			"areCommentsDisabled": &graphql.Field{
 				Type: graphql.Boolean,
+			},
+			"createdAt": &graphql.Field{
+				Type: graphql.DateTime,
 			},
 		},
 	})

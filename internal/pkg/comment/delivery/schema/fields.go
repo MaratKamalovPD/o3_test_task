@@ -36,35 +36,6 @@ func commentsByPostField(commentType *graphql.Object, usecases commentinterface.
 	}
 }
 
-// func CommentsByParentField(commentType *graphql.Object, usecases commentinterface.CommentUsecases) *graphql.Field {
-// 	return &graphql.Field{
-// 		Type:        graphql.NewList(commentType),
-// 		Description: "Get comments by parent comment id",
-// 		Args: graphql.FieldConfigArgument{
-// 			"parentId": &graphql.ArgumentConfig{Type: graphql.Int},
-// 			"limit":    &graphql.ArgumentConfig{Type: graphql.Int},
-// 			"offset":   &graphql.ArgumentConfig{Type: graphql.Int},
-// 		},
-// 		Resolve: func(p graphql.ResolveParams) (any, error) {
-// 			parentId, _ := p.Args["parentId"].(int)
-// 			limit, _ := p.Args["limit"].(int)
-// 			offset, _ := p.Args["offset"].(int)
-// 			// making parentId nil if it's 0
-// 			var pointerToParent *int
-// 			if parentId != 0 {
-// 				pointerToParent = &parentId
-// 			}
-// 			res, err := usecases.GetCommentsByParent(p.Context, args.GetCommentsArgs{
-// 				ParentID: pointerToParent,
-// 				Limit:    limit,
-// 				Offset:   offset,
-// 			})
-// 			logIfNotNil(err)
-// 			return res, err
-// 		},
-// 	}
-// }
-
 func createCommentField(commentType *graphql.Object, usecases commentinterface.CommentUsecases) *graphql.Field {
 	return &graphql.Field{
 		Type:        commentType,

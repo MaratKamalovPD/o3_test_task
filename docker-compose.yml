@@ -5,7 +5,7 @@ services:
     image: postgres:16.0-alpine3.18
     restart: always
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=o3_test_task
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
